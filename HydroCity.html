@@ -7,21 +7,15 @@
 <style>
 
 body{
-font-family: Arial, sans-serif;
-background: linear-gradient(#0f172a,#020617);
+font-family: Arial;
+background:linear-gradient(#0f172a,#020617);
 color:white;
 text-align:center;
 padding:40px;
 }
 
 h1{
-font-size:42px;
-margin-bottom:5px;
-}
-
-.subtitle{
-color:#94a3b8;
-margin-bottom:30px;
+font-size:40px;
 }
 
 .container{
@@ -46,15 +40,15 @@ font-weight:bold;
 #peopleBar{background:#22c55e;}
 #natureBar{background:#f97316;}
 
-.story{
-margin:30px 0;
-font-size:20px;
-min-height:60px;
-}
-
 .scene{
 font-size:70px;
 margin:20px;
+}
+
+.story{
+font-size:20px;
+margin:20px;
+min-height:70px;
 }
 
 button{
@@ -64,22 +58,21 @@ border:none;
 border-radius:10px;
 font-size:16px;
 cursor:pointer;
-transition:0.2s;
 }
 
 button:hover{
-transform:scale(1.05);
 background:#38bdf8;
 color:black;
+transform:scale(1.05);
 }
 
 </style>
+
 </head>
 
 <body>
 
 <h1>💧 HydroCity</h1>
-<div class="subtitle">Administra el agua de tu ciudad</div>
 
 <div class="container">
 
@@ -95,14 +88,10 @@ color:black;
 <div class="scene" id="scene">🏙️</div>
 
 <div class="story" id="story">
-Una fuerte sequía golpea HydroCity. Debes decidir cómo usar el agua restante.
+Una fuerte sequía golpea HydroCity. Debes tomar decisiones para salvar la ciudad.
 </div>
 
-<div>
-<button onclick="decision(1)">Racionar agua</button>
-<button onclick="decision(2)">Construir recicladora</button>
-<button onclick="decision(3)">Tomar agua del río</button>
-</div>
+<div id="choices"></div>
 
 </div>
 
@@ -111,165 +100,147 @@ Una fuerte sequía golpea HydroCity. Debes decidir cómo usar el agua restante.
 let water = 50
 let people = 50
 let nature = 50
+let step = 0
 
-function update(){
+const events = [
 
-document.getElementById("waterBar").style.width = water + "%"
-document.getElementById("peopleBar").style.width = people + "%"
-document.getElementById("natureBar").style.width = nature + "%"
+{
+text:"La ciudad enfrenta una sequía severa.",
+scene:"🏙️",
+choices:[
+{text:"Racionar agua",effect:()=>{water+=10;people-=10}},
+{text:"Construir recicladora",effect:()=>{water+=15;nature+=10;people-=5}},
+{text:"Tomar agua del río",effect:()=>{water+=20;nature-=15}}
+]
+},
+
+{
+text:"Los agricultores necesitan agua para los cultivos.",
+scene:"🌾",
+choices:[
+{text:"Dar agua a agricultura",effect:()=>{people+=5;water-=10}},
+{text:"Priorizar ciudad",effect:()=>{people-=5;water+=5}},
+{text:"Importar comida",effect:()=>{water+=0;people+=2}}
+]
+},
+
+{
+text:"Una empresa quiere abrir una fábrica.",
+scene:"🏭",
+choices:[
+{text:"Aceptar fábrica",effect:()=>{people+=10;nature-=10}},
+{text:"Rechazar",effect:()=>{nature+=5}},
+{text:"Aceptar con reglas ambientales",effect:()=>{people+=5;nature-=3}}
+]
+},
+
+{
+text:"Una lluvia inesperada llega a la región.",
+scene:"🌧️",
+choices:[
+{text:"Recolectar lluvia",effect:()=>{water+=15}},
+{text:"No hacer nada",effect:()=>{water+=5}},
+{text:"Construir reservas",effect:()=>{water+=10;people-=3}}
+]
+},
+
+{
+text:"Los ciudadanos protestan por las decisiones del gobierno.",
+scene:"😡",
+choices:[
+{text:"Escuchar protestas",effect:()=>{people+=5}},
+{text:"Ignorar",effect:()=>{people-=10}},
+{text:"Prometer mejoras",effect:()=>{people+=2}}
+]
+}
+
+]
+
+function updateBars(){
+
+document.getElementById("waterBar").style.width = water+"%"
+document.getElementById("peopleBar").style.width = people+"%"
+document.getElementById("natureBar").style.width = nature+"%"
 
 document.getElementById("waterBar").innerText = water
 document.getElementById("peopleBar").innerText = people
 document.getElementById("natureBar").innerText = nature
 
-checkGame()
+}
+
+function showEvent(){
+
+if(step >= events.length){
+
+alert("🏆 Lograste mantener HydroCity con vida.")
+location.reload()
+return
 
 }
 
-function decision(option){
+let e = events[step]
 
-if(option === 1){
+document.getElementById("story").innerText = e.text
+document.getElementById("scene").innerText = e.scene
 
-water += 10
-people -= 10
+let choicesDiv = document.getElementById("choices")
+choicesDiv.innerHTML = ""
 
-document.getElementById("story").innerText =
-"Decidiste racionar el agua. La ciudad ahorra recursos, pero los ciudadanos están molestos."
+e.choices.forEach((c,i)=>{
 
-document.getElementById("scene").innerText = "😡😡😡"
+let btn = document.createElement("button")
+btn.innerText = c.text
 
-}
+btn.onclick = function(){
 
-if(option === 2){
-
-water += 15
-nature += 10
-people -= 5
-
-document.getElementById("story").innerText =
-"Construiste una planta recicladora. Es cara pero ayuda al futuro de la ciudad."
-
-document.getElementById("scene").innerText = "🏭💧"
-
-}
-
-if(option === 3){
-
-water += 20
-nature -= 15
-
-document.getElementById("story").innerText =
-"Tomaste agua del río. Ahora hay más agua, pero el ecosistema está en peligro."
-
-document.getElementById("scene").innerText = "🌊⚠️"
-
-}
+c.effect()
 
 limitStats()
-update()
+updateBars()
+checkGame()
+
+step++
+showEvent()
+
+}
+
+choicesDiv.appendChild(btn)
+
+})
 
 }
 
 function limitStats(){
 
-water = Math.max(0,Math.min(100,water))
-people = Math.max(0,Math.min(100,people))
-nature = Math.max(0,Math.min(100,nature))
+water=Math.max(0,Math.min(100,water))
+people=Math.max(0,Math.min(100,people))
+nature=Math.max(0,Math.min(100,nature))
 
 }
 
 function checkGame(){
 
-if(water <= 0){
-alert("💀 HydroCity se quedó sin agua.")
+if(water<=0){
+alert("💀 La ciudad se quedó sin agua.")
 location.reload()
 }
 
-if(people <= 0){
-alert("⚠️ La población se rebeló y abandonó la ciudad.")
+if(people<=0){
+alert("⚠️ La población abandonó HydroCity.")
 location.reload()
 }
 
-if(nature <= 0){
+if(nature<=0){
 alert("🌵 El ecosistema colapsó.")
 location.reload()
 }
 
-if(water >= 100){
-alert("🏆 Ganaste. HydroCity sobrevivió a la crisis.")
-location.reload()
 }
 
-}
+updateBars()
+showEvent()
 
 </script>
 
 </body>
 </html>
-function choice(option){
-
-if(option === 1){
-
-water += 10
-people -= 5
-document.getElementById("scenario").textContent =
-"Racionaste el agua. La gente no está muy feliz."
-
-}
-
-if(option === 2){
-
-water += 15
-nature += 10
-people -= 10
-
-document.getElementById("scenario").textContent =
-"Construiste una planta recicladora. Fue caro pero ayuda al ambiente."
-
-}
-
-if(option === 3){
-
-water += 20
-nature -= 15
-
-document.getElementById("scenario").textContent =
-"Extrajiste agua del río. Ahora el ecosistema está en peligro."
-
-}
-
-updateStats()
-
-}
-
-function checkGame(){
-
-if(water <= 0){
-alert("La ciudad se quedó sin agua 💀")
-location.reload()
-}
-
-if(people <= 0){
-alert("La población abandonó la ciudad")
-location.reload()
-}
-
-if(nature <= 0){
-alert("El ecosistema colapsó 🌵")
-location.reload()
-}
-
-if(water >= 100){
-alert("¡Ganaste! Lograste salvar la ciudad 💧")
-location.reload()
-}
-
-}
-
-</script>
-
-</body>
-</html>
-
-
-
