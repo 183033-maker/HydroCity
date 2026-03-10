@@ -7,63 +7,63 @@
 <style>
 
 body{
-font-family: Arial;
-background:linear-gradient(#0f172a,#020617);
+font-family:Arial;
+background:#0f172a;
 color:white;
 text-align:center;
-padding:40px;
 }
 
 h1{
-font-size:40px;
+margin-top:20px;
 }
 
-.container{
-max-width:700px;
-margin:auto;
+.city{
+background:#1e293b;
+height:200px;
+margin:20px;
+border-radius:10px;
+position:relative;
+overflow:hidden;
+}
+
+.person{
+position:absolute;
+font-size:24px;
+}
+
+.stats{
+margin:10px;
 }
 
 .bar{
-background:#1e293b;
-border-radius:20px;
-margin:10px 0;
+background:#334155;
+height:20px;
+border-radius:10px;
+margin:5px auto;
+width:300px;
 overflow:hidden;
 }
 
 .fill{
-height:25px;
-line-height:25px;
-font-weight:bold;
+height:100%;
+text-align:center;
+font-size:14px;
 }
 
-#waterBar{background:#38bdf8;}
-#peopleBar{background:#22c55e;}
-#natureBar{background:#f97316;}
-
-.scene{
-font-size:70px;
-margin:20px;
-}
-
-.story{
-font-size:20px;
-margin:20px;
-min-height:70px;
-}
+.water{background:#38bdf8;}
+.people{background:#22c55e;}
+.nature{background:#f97316;}
 
 button{
-padding:15px 25px;
+padding:10px 20px;
 margin:10px;
 border:none;
-border-radius:10px;
-font-size:16px;
+border-radius:8px;
 cursor:pointer;
 }
 
 button:hover{
 background:#38bdf8;
-color:black;
-transform:scale(1.05);
 }
 
 </style>
@@ -74,132 +74,138 @@ transform:scale(1.05);
 
 <h1>💧 HydroCity</h1>
 
-<div class="container">
+<h2>Día: <span id="day">1</span> / 10</h2>
 
-<div>Agua</div>
-<div class="bar"><div id="waterBar" class="fill" style="width:50%">50</div></div>
+<div class="stats">
 
-<div>Población</div>
-<div class="bar"><div id="peopleBar" class="fill" style="width:50%">50</div></div>
+Agua
+<div class="bar"><div id="waterBar" class="fill water" style="width:50%">50</div></div>
 
-<div>Ambiente</div>
-<div class="bar"><div id="natureBar" class="fill" style="width:50%">50</div></div>
+Población
+<div class="bar"><div id="peopleBar" class="fill people" style="width:50%">50</div></div>
 
-<div class="scene" id="scene">🏙️</div>
+Ambiente
+<div class="bar"><div id="natureBar" class="fill nature" style="width:50%">50</div></div>
 
-<div class="story" id="story">
-Una fuerte sequía golpea HydroCity. Debes tomar decisiones para salvar la ciudad.
 </div>
+
+<div class="city" id="city"></div>
+
+<p id="story">La ciudad enfrenta una fuerte sequía.</p>
 
 <div id="choices"></div>
 
-</div>
-
 <script>
 
-let water = 50
-let people = 50
-let nature = 50
-let step = 0
-
-const events = [
-
-{
-text:"La ciudad enfrenta una sequía severa.",
-scene:"🏙️",
-choices:[
-{text:"Racionar agua",effect:()=>{water+=10;people-=10}},
-{text:"Construir recicladora",effect:()=>{water+=15;nature+=10;people-=5}},
-{text:"Tomar agua del río",effect:()=>{water+=20;nature-=15}}
-]
-},
-
-{
-text:"Los agricultores necesitan agua para los cultivos.",
-scene:"🌾",
-choices:[
-{text:"Dar agua a agricultura",effect:()=>{people+=5;water-=10}},
-{text:"Priorizar ciudad",effect:()=>{people-=5;water+=5}},
-{text:"Importar comida",effect:()=>{water+=0;people+=2}}
-]
-},
-
-{
-text:"Una empresa quiere abrir una fábrica.",
-scene:"🏭",
-choices:[
-{text:"Aceptar fábrica",effect:()=>{people+=10;nature-=10}},
-{text:"Rechazar",effect:()=>{nature+=5}},
-{text:"Aceptar con reglas ambientales",effect:()=>{people+=5;nature-=3}}
-]
-},
-
-{
-text:"Una lluvia inesperada llega a la región.",
-scene:"🌧️",
-choices:[
-{text:"Recolectar lluvia",effect:()=>{water+=15}},
-{text:"No hacer nada",effect:()=>{water+=5}},
-{text:"Construir reservas",effect:()=>{water+=10;people-=3}}
-]
-},
-
-{
-text:"Los ciudadanos protestan por las decisiones del gobierno.",
-scene:"😡",
-choices:[
-{text:"Escuchar protestas",effect:()=>{people+=5}},
-{text:"Ignorar",effect:()=>{people-=10}},
-{text:"Prometer mejoras",effect:()=>{people+=2}}
-]
-}
-
-]
+let water=50
+let people=50
+let nature=50
+let day=1
 
 function updateBars(){
 
-document.getElementById("waterBar").style.width = water+"%"
-document.getElementById("peopleBar").style.width = people+"%"
-document.getElementById("natureBar").style.width = nature+"%"
+document.getElementById("waterBar").style.width=water+"%"
+document.getElementById("peopleBar").style.width=people+"%"
+document.getElementById("natureBar").style.width=nature+"%"
 
-document.getElementById("waterBar").innerText = water
-document.getElementById("peopleBar").innerText = people
-document.getElementById("natureBar").innerText = nature
+document.getElementById("waterBar").innerText=water
+document.getElementById("peopleBar").innerText=people
+document.getElementById("natureBar").innerText=nature
 
 }
 
+function spawnCitizens(){
+
+let city=document.getElementById("city")
+city.innerHTML=""
+
+for(let i=0;i<10;i++){
+
+let p=document.createElement("div")
+p.className="person"
+
+let mood="🙂"
+
+if(people<30) mood="😡"
+if(people>70) mood="😃"
+
+p.innerText=mood
+
+p.style.left=Math.random()*90+"%"
+p.style.top=Math.random()*80+"%"
+
+city.appendChild(p)
+
+}
+
+}
+
+const events=[
+
+{
+text:"La sequía empeora.",
+choices:[
+{text:"Racionar agua",effect:()=>{water+=10;people-=10}},
+{text:"Construir recicladora",effect:()=>{water+=15;nature+=5;people-=5}},
+{text:"Sacar agua del río",effect:()=>{water+=20;nature-=15}}
+]
+},
+
+{
+text:"Los agricultores necesitan agua.",
+choices:[
+{text:"Dar agua",effect:()=>{people+=5;water-=10}},
+{text:"Negar agua",effect:()=>{people-=10}},
+{text:"Importar comida",effect:()=>{people+=2}}
+]
+},
+
+{
+text:"Una fábrica quiere instalarse.",
+choices:[
+{text:"Aceptar",effect:()=>{people+=10;nature-=10}},
+{text:"Rechazar",effect:()=>{nature+=5}},
+{text:"Regular contaminación",effect:()=>{people+=5;nature-=3}}
+]
+}
+
+]
+
 function showEvent(){
 
-if(step >= events.length){
+if(day>10){
 
-alert("🏆 Lograste mantener HydroCity con vida.")
+alert("🏆 Sobreviviste 10 días y salvaste HydroCity")
 location.reload()
 return
 
 }
 
-let e = events[step]
+document.getElementById("day").innerText=day
 
-document.getElementById("story").innerText = e.text
-document.getElementById("scene").innerText = e.scene
+let event=events[Math.floor(Math.random()*events.length)]
 
-let choicesDiv = document.getElementById("choices")
-choicesDiv.innerHTML = ""
+document.getElementById("story").innerText=event.text
 
-e.choices.forEach((c,i)=>{
+let choicesDiv=document.getElementById("choices")
+choicesDiv.innerHTML=""
 
-let btn = document.createElement("button")
-btn.innerText = c.text
+event.choices.forEach(c=>{
 
-btn.onclick = function(){
+let btn=document.createElement("button")
+btn.innerText=c.text
+
+btn.onclick=()=>{
 
 c.effect()
 
 limitStats()
-updateBars()
-checkGame()
 
-step++
+day++
+
+updateBars()
+spawnCitizens()
+checkGame()
 showEvent()
 
 }
@@ -221,23 +227,24 @@ nature=Math.max(0,Math.min(100,nature))
 function checkGame(){
 
 if(water<=0){
-alert("💀 La ciudad se quedó sin agua.")
+alert("💀 HydroCity se quedó sin agua")
 location.reload()
 }
 
 if(people<=0){
-alert("⚠️ La población abandonó HydroCity.")
+alert("⚠️ La población abandonó la ciudad")
 location.reload()
 }
 
 if(nature<=0){
-alert("🌵 El ecosistema colapsó.")
+alert("🌵 El ecosistema colapsó")
 location.reload()
 }
 
 }
 
 updateBars()
+spawnCitizens()
 showEvent()
 
 </script>
