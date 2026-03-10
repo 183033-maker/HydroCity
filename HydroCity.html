@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>HydroCity</title>
+
+<style>
+
+body{
+font-family: Arial;
+text-align:center;
+background:#1e272e;
+color:white;
+margin-top:50px;
+}
+
+h1{
+font-size:40px;
+}
+
+.stats{
+font-size:22px;
+margin-bottom:30px;
+}
+
+.game{
+margin-top:30px;
+}
+
+button{
+padding:15px 25px;
+margin:10px;
+border:none;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+transition:0.2s;
+}
+
+button:hover{
+background:#00a8ff;
+color:white;
+transform:scale(1.05);
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>💧 Última Gota</h1>
+
+<div class="stats">
+<p>Agua: <span id="water">50</span></p>
+<p>Población: <span id="people">50</span></p>
+<p>Ambiente: <span id="nature">50</span></p>
+</div>
+
+<div class="game">
+
+<h2 id="scenario">La ciudad enfrenta una sequía. ¿Qué haces?</h2>
+
+<button onclick="choice(1)">Racionar agua</button>
+<button onclick="choice(2)">Construir planta recicladora</button>
+<button onclick="choice(3)">Extraer agua del río</button>
+
+</div>
+
+<script>
+
+let water = 50
+let people = 50
+let nature = 50
+
+function updateStats(){
+
+document.getElementById("water").textContent = water
+document.getElementById("people").textContent = people
+document.getElementById("nature").textContent = nature
+
+checkGame()
+
+}
+
+function choice(option){
+
+if(option === 1){
+
+water += 10
+people -= 5
+document.getElementById("scenario").textContent =
+"Racionaste el agua. La gente no está muy feliz."
+
+}
+
+if(option === 2){
+
+water += 15
+nature += 10
+people -= 10
+
+document.getElementById("scenario").textContent =
+"Construiste una planta recicladora. Fue caro pero ayuda al ambiente."
+
+}
+
+if(option === 3){
+
+water += 20
+nature -= 15
+
+document.getElementById("scenario").textContent =
+"Extrajiste agua del río. Ahora el ecosistema está en peligro."
+
+}
+
+updateStats()
+
+}
+
+function checkGame(){
+
+if(water <= 0){
+alert("La ciudad se quedó sin agua 💀")
+location.reload()
+}
+
+if(people <= 0){
+alert("La población abandonó la ciudad")
+location.reload()
+}
+
+if(nature <= 0){
+alert("El ecosistema colapsó 🌵")
+location.reload()
+}
+
+if(water >= 100){
+alert("¡Ganaste! Lograste salvar la ciudad 💧")
+location.reload()
+}
+
+}
+
+</script>
+
+</body>
+</html>
